@@ -26,8 +26,6 @@ const auth = new google.auth.GoogleAuth({
 
     private_key: normalizePrivateKey(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY),
 
-    private_key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.replace(/\\n/g, "\n"),
-
   },
   scopes: [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
