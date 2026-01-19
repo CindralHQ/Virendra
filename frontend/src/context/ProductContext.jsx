@@ -21,21 +21,12 @@ const resolveApiBase = () => {
   }
 
   // 2. Local development environment
-  if (typeof window !== "undefined") {
-    const { hostname } = window.location;
-
-    const isLocalhost =
-      hostname === "localhost" ||
-      hostname === "127.0.0.1" ||
-      hostname === "::1";
-
-    if (isLocalhost) {
-      return "http://localhost:3000";
-    }
+  if (import.meta.env.DEV) {
+    return "http://localhost:3000";
   }
 
-  // 3. Default fallback (never used in production)
-  return "http://localhost:3000";
+  // 3. Production: use relative path (same origin)
+  return "";
 };
 
 const API_BASE_URL = resolveApiBase();
