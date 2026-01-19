@@ -1,0 +1,112 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui" {
+  themes: ["corporate", "emerald", "pastel", "winter", "dracula", "light"];
+}
+
+@layer base {
+  :root:has(input.theme-controller[value=virendra]:checked),
+  [data-theme="virendra"] {
+    color-scheme: light;
+    --color-base-100: #f7faf2;
+    --color-base-200: #eef4e6;
+    --color-base-300: #dfe8d5;
+    --color-base-content: #1b2b22;
+    --color-primary: #1a9b84;
+    --color-primary-content: #f7fff9;
+    --color-secondary: #63b63c;
+    --color-secondary-content: #0f2416;
+    --color-accent: #d7e84b;
+    --color-accent-content: #2b3615;
+    --color-neutral: #1f2b23;
+    --color-neutral-content: #e6f2e7;
+    --color-info: #2b9fb3;
+    --color-info-content: #0f252d;
+    --color-success: #3aa85a;
+    --color-success-content: #0f2416;
+    --color-warning: #d3b94c;
+    --color-warning-content: #2d230c;
+    --color-error: #d75a47;
+    --color-error-content: #2a0f0c;
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+  }
+}
+
+:root {
+  font-family: "Inter", "Space Grotesk", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: oklch(var(--b1) / 1);
+  color: oklch(var(--bc) / 1);
+}
+
+:where(a:not(.btn)) {
+  color: inherit;
+  text-decoration: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes logoSplash {
+  0% { opacity: 0; transform: scale(0.95); }
+  12% { opacity: 1; transform: scale(1); }
+  75% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+
+.logo-splash {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in oklab, var(--color-base-100) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  z-index: 60;
+}
+
+.logo-splash--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.logo-splash__logo {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  animation: logoSplash 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
