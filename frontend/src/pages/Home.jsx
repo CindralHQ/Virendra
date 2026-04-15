@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import Hero from "../components/HeroSection/Hero.jsx";
 import FeaturedCategories from "../components/HeroSection/FeaturedCategories.jsx";
 import ContactUs from "../components/ContactUs.jsx";
+import Seo from "../components/Seo.jsx";
+import {
+  buildOrganizationSchema,
+  buildWebsiteSchema,
+} from "../utils/seo.js";
 
 const highlights = [
   {
@@ -26,9 +31,62 @@ const partnerTags = [
   "Cosmetic & home care brands",
 ];
 
+const localSearchAnswers = [
+  {
+    question: "Where is Virendra Research Chem LLP located?",
+    answer:
+      "Virendra Research Chem LLP is based in Navi Mumbai, Maharashtra, India, and serves buyers across Mumbai, the wider Maharashtra region, and export markets.",
+  },
+  {
+    question: "What products does Virendra Research Chem LLP manufacture?",
+    answer:
+      "The company manufactures aroma chemicals, pheromone intermediates, specialty chemical intermediates, and supports custom synthesis and process scale-up programs.",
+  },
+  {
+    question: "Does Virendra support custom synthesis and pilot batches?",
+    answer:
+      "Yes. The team supports custom synthesis, pilot batches, process optimization, and compliance-ready documentation for specialty chemical programs.",
+  },
+  {
+    question: "Which industries does Virendra serve?",
+    answer:
+      "Virendra supplies fragrance and flavour manufacturers, agro-solution and IPM programs, specialty chemical users, and custom R&D-led manufacturing requirements.",
+  },
+];
+
 const Home = () => {
   return (
     <div className="space-y-16 pb-16 bg-base-100 text-base-content">
+      <Seo
+        title="Chemical Manufacturer in Navi Mumbai for Aroma, Pheromone and Specialty Intermediates"
+        description="Virendra Research Chem LLP is a chemical manufacturer in Navi Mumbai, Maharashtra offering aroma chemicals, pheromone intermediates, specialty molecules, and custom synthesis support for industrial buyers."
+        canonicalPath="/"
+        keywords={[
+          "Virendra Research Chem LLP",
+          "chemical manufacturer Navi Mumbai",
+          "chemical manufacturer Mumbai",
+          "chemical manufacturer Maharashtra",
+          "aroma chemicals manufacturer India",
+          "pheromone intermediates manufacturer India",
+          "specialty chemical manufacturer Navi Mumbai",
+        ]}
+        jsonLd={[
+          buildOrganizationSchema(),
+          buildWebsiteSchema(),
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: localSearchAnswers.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer,
+              },
+            })),
+          },
+        ]}
+      />
       <Hero />
 
       <section className="px-6">
@@ -48,6 +106,61 @@ const Home = () => {
       </section>
 
       <FeaturedCategories />
+
+      <section className="px-6">
+        <div className="max-w-6xl mx-auto grid gap-8 lg:grid-cols-[1.2fr_0.8fr] rounded-3xl border border-base-200 bg-base-100 p-8 md:p-10 shadow-sm">
+          <div className="space-y-5">
+            <p className="text-sm uppercase tracking-[0.35em] text-primary/70 font-semibold">
+              Navi Mumbai Manufacturing
+            </p>
+            <h2 className="text-3xl font-bold leading-tight">
+              Chemical manufacturer in Navi Mumbai serving Mumbai, Maharashtra,
+              and global speciality-chemistry buyers
+            </h2>
+            <p className="text-base-content/70 text-lg leading-relaxed">
+              Virendra Research Chem LLP manufactures aroma chemicals,
+              pheromone intermediates, specialty chemical intermediates, and
+              custom synthesis programs from Navi Mumbai, Maharashtra. Our team
+              supports industrial sourcing, R&amp;D-led scale-up, pilot batches,
+              and documentation-led supply for regulated buyer workflows.
+            </p>
+            <div className="flex flex-wrap gap-3 text-sm">
+              {[
+                "Chemical manufacturing in Navi Mumbai",
+                "Custom synthesis in Maharashtra",
+                "Aroma chemicals for fragrance houses",
+                "Pheromone intermediates for IPM programs",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-base-300 px-4 py-2 text-base-content/70"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-base-200 bg-base-200/60 p-6">
+            <h3 className="text-xl font-semibold">What buyers search us for</h3>
+            <ul className="mt-5 space-y-4 text-base-content/70">
+              {[
+                "Virendra Research Chem LLP",
+                "chemical manufacturer in Navi Mumbai",
+                "chemical manufacturer in Mumbai",
+                "specialty chemical manufacturer in Maharashtra",
+                "aroma chemicals manufacturer in India",
+                "pheromone intermediates manufacturer",
+              ].map((item) => (
+                <li key={item} className="flex gap-3">
+                  <span className="mt-2 h-2 w-2 rounded-full bg-primary" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
 
       <section className="px-6">
         <div className="max-w-6xl mx-auto rounded-3xl border border-base-200 bg-gradient-to-r from-base-200 via-base-100 to-base-200 p-10 md:p-16 shadow-lg">
@@ -86,6 +199,32 @@ const Home = () => {
                 Consult a chemist
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div>
+            <p className="text-sm uppercase tracking-[0.35em] text-primary/70 font-semibold">
+              Search and AI FAQs
+            </p>
+            <h2 className="mt-3 text-3xl font-bold">
+              Entity-rich answers for buyers and AI assistants
+            </h2>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {localSearchAnswers.map((item) => (
+              <article
+                key={item.question}
+                className="rounded-3xl border border-base-200 bg-base-100 p-6 shadow-sm"
+              >
+                <h3 className="text-xl font-semibold">{item.question}</h3>
+                <p className="mt-3 text-base-content/70 leading-relaxed">
+                  {item.answer}
+                </p>
+              </article>
+            ))}
           </div>
         </div>
       </section>

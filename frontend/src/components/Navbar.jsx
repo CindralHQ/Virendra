@@ -5,6 +5,7 @@ import MaterialIcon from "./MaterialIcon.jsx";
 import useProducts from "../hooks/useProducts.js";
 import demoProducts from "../data/demoProducts.js";
 import featuredCategories from "../data/featuredCategories.js";
+import { getProductPath } from "../utils/seo.js";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -63,7 +64,7 @@ const Navbar = () => {
     );
 
     if (exactMatch) {
-      navigate(`/product/${exactMatch.id}`);
+      navigate(getProductPath(exactMatch));
       setIsSearchOpen(false);
       setQuery("");
       return;
@@ -73,8 +74,8 @@ const Navbar = () => {
     setIsSearchOpen(false);
   };
 
-  const handleProductSelect = (productId) => {
-    navigate(`/product/${productId}`);
+  const handleProductSelect = (product) => {
+    navigate(getProductPath(product));
     setIsSearchOpen(false);
     setQuery("");
   };
@@ -282,7 +283,7 @@ const SearchModal = ({
                   <button
                     key={product.id}
                     type="button"
-                    onClick={() => onProductSelect(product.id)}
+                    onClick={() => onProductSelect(product)}
                     className="flex w-full flex-col gap-3 rounded-2xl border border-base-200 bg-white px-4 py-4 text-left transition hover:border-primary/40 hover:bg-base-200 sm:flex-row sm:items-start sm:justify-between"
                   >
                     <div>

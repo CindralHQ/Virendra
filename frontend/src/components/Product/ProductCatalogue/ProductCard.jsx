@@ -6,9 +6,10 @@ import {
   normalizeDriveImageUrl,
 } from "../../../utils/productImages.js";
 import { formatCasNumber } from "../../../utils/productFormatting.js";
+import { getProductPath } from "../../../utils/seo.js";
 
 const ProductCard = ({ product }) => {
-  const { title, casNo, category, description, image, bondImage, id } = product;
+  const { title, casNo, category, description, image, bondImage } = product;
   const productImage =
     normalizeDriveImageUrl(image) || getProductImage(product);
   const bondImageUrl = normalizeDriveImageUrl(bondImage);
@@ -21,7 +22,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <Link
-      to={`/product/${id}`}
+      to={getProductPath(product)}
       className="group block rounded-3xl border border-base-200 bg-base-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
     >
       <article className="flex h-full flex-col">

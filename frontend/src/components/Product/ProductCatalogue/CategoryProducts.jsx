@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ProductCard from "./ProductCard.jsx";
 import useProducts from "../../../hooks/useProducts.js";
@@ -6,6 +6,13 @@ import featuredCategories from "../../../data/featuredCategories.js";
 import MaterialIcon from "../../MaterialIcon.jsx";
 import demoProducts from "../../../data/demoProducts.js";
 import QuickNavigation from "./QuickNavigation.jsx";
+import Seo from "../../Seo.jsx";
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  getCategoryPath,
+  getProductPath,
+} from "../../../utils/seo.js";
 
 const CategoryProducts = () => {
   const { category } = useParams();
@@ -19,7 +26,7 @@ const CategoryProducts = () => {
       ? category.replace(/-/g, " ").toLowerCase()
       : null;
 
-  const filteredProducts = useMemo(() => {
+  const filteredProducts = (() => {
     const sourceProducts = products.length ? products : demoProducts;
 
     let list = [...sourceProducts];
@@ -45,12 +52,43 @@ const CategoryProducts = () => {
     }
 
     return list;
-  }, [products, query, normalizedCategory]);
+  })();
 
   if (isLoading) return <p className="text-center py-10">Loading...</p>;
 
   return (
     <section className="py-16 bg-base-200 min-h-screen">
+      <Seo
+        title={
+          categoryData
+            ? `${categoryData.title} in Navi Mumbai`
+            : "Specialty Chemical Product Category"
+        }
+        description={
+          categoryData
+            ? `${categoryData.overview} Manufactured and supplied by Virendra Research Chem LLP in Navi Mumbai, Maharashtra.`
+            : "Browse a specialty chemical category from Virendra Research Chem LLP."
+        }
+        canonicalPath={normalizedCategory ? getCategoryPath(category) : "/products"}
+        keywords={[
+          categoryData?.title,
+          `${categoryData?.title || "specialty chemicals"} manufacturer`,
+          `${categoryData?.title || "specialty chemicals"} Navi Mumbai`,
+          "chemical manufacturer Maharashtra",
+        ]}
+        jsonLd={[
+          buildBreadcrumbSchema(
+            [
+              { name: "Home", path: "/" },
+              { name: "Products", path: "/products" },
+              categoryData
+                ? { name: categoryData.title, path: getCategoryPath(categoryData.slug) }
+                : null,
+            ].filter(Boolean)
+          ),
+          buildItemListSchema(filteredProducts.slice(0, 30), getProductPath),
+        ]}
+      />
       <div className="max-w-6xl mx-auto px-6 space-y-10">
         <QuickNavigation activeCategorySlug={categoryData?.slug} />
 

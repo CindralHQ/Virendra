@@ -11,6 +11,13 @@ import {
   normalizeDriveImageUrl,
 } from "../../../utils/productImages.js";
 import { formatCasNumber } from "../../../utils/productFormatting.js";
+import Seo from "../../Seo.jsx";
+import {
+  buildBreadcrumbSchema,
+  buildProductSchema,
+  getCategoryPath,
+  getProductPath,
+} from "../../../utils/seo.js";
 
 const ProductInfo = () => {
   const { id } = useParams();
@@ -89,6 +96,34 @@ const ProductInfo = () => {
 
   return (
     <div className="bg-base-100 text-base-content">
+      <Seo
+        title={product.seoTitle || product.title}
+        description={product.seoDescription || product.description}
+        canonicalPath={getProductPath(product)}
+        keywords={product.seoKeywords || product.keywords || product.title}
+        image={heroImageUrl || "/Logo.png"}
+        type="product"
+        jsonLd={[
+          buildBreadcrumbSchema(
+            [
+              { name: "Home", path: "/" },
+              { name: "Products", path: "/products" },
+              activeCategory
+                ? {
+                    name: activeCategory.title,
+                    path: getCategoryPath(activeCategory.slug),
+                  }
+                : null,
+              { name: product.title, path: getProductPath(product) },
+            ].filter(Boolean)
+          ),
+          buildProductSchema({
+            ...product,
+            image: productImageUrl,
+            bondImage: bondImageUrl,
+          }),
+        ]}
+      />
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-12">
         <QuickNavigation activeCategorySlug={activeCategory?.slug} />
 

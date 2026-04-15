@@ -141,9 +141,7 @@ import siteConfig from "../config/siteConfig.js";
 import MaterialIcon from "./MaterialIcon.jsx";
 
 const CONTACT_API_URL = (
-  import.meta.env.VITE_CONTACT_API_URL ||
-  import.meta.env.VITE_PRODUCTS_API_URL ||
-  ""
+  import.meta.env.VITE_CONTACT_API_URL || "/api/contact"
 ).replace(/\/$/, "");
 
 const contactDetails = [
@@ -192,12 +190,6 @@ const ContactUs = () => {
     setNotice(null);
     setLoading(true);
 
-    if (!CONTACT_API_URL) {
-      setLoading(false);
-      setNotice("Missing contact endpoint. Set VITE_CONTACT_API_URL.");
-      return;
-    }
-
     const form = e.currentTarget;
     const payload = Object.fromEntries(new FormData(form).entries());
     const nextErrors = {};
@@ -238,16 +230,16 @@ const ContactUs = () => {
     setErrors({});
 
     try {
-      const body = new URLSearchParams({ type: "contact", ...payload });
-
-      // Apps Script does not reliably return CORS headers for POST,
-      // so use no-cors and assume success if the request is sent.
-      await fetch(CONTACT_API_URL, {
+      const response = await fetch(CONTACT_API_URL, {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Request failed.");
+      }
 
       setNotice({
         type: "success",
@@ -257,7 +249,7 @@ const ContactUs = () => {
     } catch (err) {
       setNotice({
         type: "error",
-        message: "Something went wrong. Please try again.",
+        message: err.message || "Something went wrong. Please try again.",
       });
     } finally {
       setLoading(false);

@@ -1,6 +1,12 @@
 import React, { useMemo } from "react";
 import ProductCatalogue from "../components/Product/ProductCatalogue/ProductCatalogue.jsx";
 import useProducts from "../hooks/useProducts.js";
+import Seo from "../components/Seo.jsx";
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  getProductPath,
+} from "../utils/seo.js";
 
 const Products = () => {
   const { products, isLoading } = useProducts();
@@ -19,6 +25,25 @@ const Products = () => {
 
   return (
     <div className="space-y-12 pb-16 bg-base-100 text-base-content">
+      <Seo
+        title="Product Catalogue for Aroma Chemicals, Pheromone Intermediates and Specialty Molecules"
+        description="Browse Virendra Research Chem LLP's product catalogue of aroma chemicals, pheromone intermediates, and specialty chemical molecules manufactured in Navi Mumbai, Maharashtra."
+        canonicalPath="/products"
+        keywords={[
+          "chemical product catalogue India",
+          "aroma chemicals catalogue",
+          "pheromone intermediates supplier",
+          "specialty chemical intermediates Navi Mumbai",
+          "Virendra Research Chem products",
+        ]}
+        jsonLd={[
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Products", path: "/products" },
+          ]),
+          buildItemListSchema(products.slice(0, 30), getProductPath),
+        ]}
+      />
       <section className="bg-base-200">
         <div className="max-w-6xl mx-auto px-6 py-16">
           <p className="uppercase tracking-[0.4em] text-md text-primary/70 font-semibold">

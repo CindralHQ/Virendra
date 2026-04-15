@@ -7,6 +7,12 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  buildProductDescription,
+  buildProductKeywords,
+  buildProductTitle,
+  getProductSlug,
+} from "../utils/seo.js";
 
 const ProductContext = createContext(null);
 const PRODUCT_CACHE_KEY = "products";
@@ -113,6 +119,20 @@ export const ProductProvider = ({ children }) => {
         image: normalizeText(product.image),
         bondImage: normalizeText(product.bondImage),
         timestamp: normalizeText(product.timestamp),
+        metaTitle: normalizeText(product.metaTitle || product.meta_title),
+        metaDescription: normalizeText(
+          product.metaDescription || product.meta_description
+        ),
+        keywords: normalizeText(product.keywords || product.meta_keywords),
+        applications: normalizeText(product.applications),
+        slug: normalizeText(product.slug),
+      }))
+      .map((product) => ({
+        ...product,
+        slug: getProductSlug(product),
+        seoTitle: buildProductTitle(product),
+        seoDescription: buildProductDescription(product),
+        seoKeywords: buildProductKeywords(product).join(", "),
       }));
 
       setProducts(normalized);
@@ -164,6 +184,7 @@ export const ProductProvider = ({ children }) => {
 // -----------------------------
 // HOOK
 // -----------------------------
+// eslint-disable-next-line react-refresh/only-export-components
 export const useProductContext = () => {
   const context = useContext(ProductContext);
   if (!context) {
