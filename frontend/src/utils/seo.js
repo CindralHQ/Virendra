@@ -178,6 +178,30 @@ export const buildWebsiteSchema = () => ({
   },
 });
 
+export const buildBlogCollectionSchema = (posts) => ({
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  name: `${siteConfig.company.shortName} Blog`,
+  url: toAbsoluteUrl("/blogs"),
+  description:
+    "Articles on aroma chemicals, pheromone intermediates, specialty intermediates, and custom synthesis sourcing.",
+  publisher: {
+    "@type": "Organization",
+    name: siteConfig.company.name,
+    logo: {
+      "@type": "ImageObject",
+      url: toAbsoluteUrl("/Logo.png"),
+    },
+  },
+  blogPost: posts.map((post) => ({
+    "@type": "BlogPosting",
+    headline: post.title,
+    url: toAbsoluteUrl(`/blogs/${post.slug}`),
+    datePublished: post.datePublished,
+    dateModified: post.dateModified || post.datePublished,
+  })),
+});
+
 export const buildBreadcrumbSchema = (items) => ({
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -199,6 +223,45 @@ export const buildItemListSchema = (items, itemPathBuilder) => ({
     name: item.title || item.name,
   })),
 });
+
+export const buildBlogPostingSchema = (post) => {
+  const articleBody = (post.sections || [])
+    .flatMap((section) => [
+      section.heading,
+      ...(section.paragraphs || []),
+      ...(section.bullets || []),
+    ])
+    .join(" ");
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description,
+    keywords: [post.targetKeyword, ...(post.secondaryKeywords || [])].join(", "),
+    articleSection: post.category,
+    datePublished: post.datePublished,
+    dateModified: post.dateModified || post.datePublished,
+    author: {
+      "@type": "Organization",
+      name: post.author || siteConfig.company.name,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.company.name,
+      logo: {
+        "@type": "ImageObject",
+        url: toAbsoluteUrl("/Logo.png"),
+      },
+    },
+    image: post.coverImage ? [toAbsoluteUrl(post.coverImage)] : [toAbsoluteUrl("/Logo.png")],
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": toAbsoluteUrl(`/blogs/${post.slug}`),
+    },
+    articleBody,
+  };
+};
 
 export const buildProductSchema = (product) => {
   const casNo = formatCasNumber(product?.casNo);

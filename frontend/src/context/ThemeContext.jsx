@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createContext, useEffect, useMemo, useState } from "react";
 
 const THEMES = ["virendra"];
 const THEME_STORAGE_KEY = "selected-theme";
@@ -46,12 +40,4 @@ export const ThemeProvider = ({ children }) => {
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used inside ThemeProvider");
-  }
-  return context;
 };

@@ -1,28 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import ConnectFab from "../components/ConnectFab.jsx";
+import EnquiryCartDrawer from "../components/EnquiryCartDrawer.jsx";
 
 const MainLayout = () => {
   const location = useLocation();
-  const [showLogoSplash, setShowLogoSplash] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  useEffect(() => {
-    setShowLogoSplash(true);
-    const timer = setTimeout(() => setShowLogoSplash(false), 2000);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
-
   return (
     <div className="min-h-screen bg-base-100 flex flex-col text-base-content">
-      <div className={`logo-splash ${showLogoSplash ? "logo-splash--visible" : ""}`}>
+      <div key={location.pathname} className="logo-splash logo-splash--animate">
         <img
-          key={location.pathname}
           src="/Logo.png"
           alt="Virendra logo"
           className="logo-splash__logo"
@@ -33,6 +26,7 @@ const MainLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      <EnquiryCartDrawer />
       <ConnectFab />
     </div>
   );

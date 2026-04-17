@@ -8,6 +8,8 @@ import Products from "./pages/Products.jsx";
 import Contact from "./pages/Contact.jsx";
 import CategoryProducts from "./components/Product/ProductCatalogue/CategoryProducts.jsx";
 import BrandGuidelines from "./pages/BrandGuidelines.jsx";
+import Blogs from "./pages/Blogs.jsx";
+import BlogPost from "./pages/BlogPost.jsx";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id/:slug?" element={<ProductInfo />} />
         <Route path="/products/:category" element={<CategoryProducts />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs/:slug" element={<BlogPost />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/brand-guidelines" element={<BrandGuidelines />} />
       </Route>

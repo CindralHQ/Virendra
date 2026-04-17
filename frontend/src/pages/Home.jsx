@@ -4,6 +4,7 @@ import Hero from "../components/HeroSection/Hero.jsx";
 import FeaturedCategories from "../components/HeroSection/FeaturedCategories.jsx";
 import ContactUs from "../components/ContactUs.jsx";
 import Seo from "../components/Seo.jsx";
+import { blogPosts, getBlogPath } from "../data/blogPosts.js";
 import {
   buildOrganizationSchema,
   buildWebsiteSchema,
@@ -35,7 +36,7 @@ const localSearchAnswers = [
   {
     question: "Where is Virendra Research Chem LLP located?",
     answer:
-      "Virendra Research Chem LLP is based in Navi Mumbai, Maharashtra, India, and serves buyers across Mumbai, the wider Maharashtra region, and export markets.",
+      "Virendra Research Chem LLP, headquartered in Navi Mumbai, Maharashtra, India, is a globally oriented chemical manufacturer serving clients across India and US, Europe, New Zealand, and other international markets.",
   },
   {
     question: "What products does Virendra Research Chem LLP manufacture?",
@@ -108,28 +109,29 @@ const Home = () => {
       <FeaturedCategories />
 
       <section className="px-6">
-        <div className="max-w-6xl mx-auto grid gap-8 lg:grid-cols-[1.2fr_0.8fr] rounded-3xl border border-base-200 bg-base-100 p-8 md:p-10 shadow-sm">
+        <div className="max-w-6xl mx-auto rounded-3xl border border-base-200 bg-base-100 p-8 md:p-10 shadow-sm">
           <div className="space-y-5">
             <p className="text-sm uppercase tracking-[0.35em] text-primary/70 font-semibold">
-              Navi Mumbai Manufacturing
+              Global Manufacturing Support
             </p>
             <h2 className="text-3xl font-bold leading-tight">
-              Chemical manufacturer in Navi Mumbai serving Mumbai, Maharashtra,
-              and global speciality-chemistry buyers
+              Specialty chemical manufacturing for industrial buyers across markets
             </h2>
             <p className="text-base-content/70 text-lg leading-relaxed">
               Virendra Research Chem LLP manufactures aroma chemicals,
               pheromone intermediates, specialty chemical intermediates, and
-              custom synthesis programs from Navi Mumbai, Maharashtra. Our team
-              supports industrial sourcing, R&amp;D-led scale-up, pilot batches,
-              and documentation-led supply for regulated buyer workflows.
+              custom synthesis programs for buyers who need reliable quality,
+              responsive technical support, and steady scale-up capability. Our
+              team supports industrial sourcing, pilot batches, process
+              development, and documentation-led supply for regulated and
+              performance-focused workflows.
             </p>
             <div className="flex flex-wrap gap-3 text-sm">
               {[
-                "Chemical manufacturing in Navi Mumbai",
-                "Custom synthesis in Maharashtra",
                 "Aroma chemicals for fragrance houses",
                 "Pheromone intermediates for IPM programs",
+                "Specialty intermediates for industrial applications",
+                "Custom synthesis and scale-up support",
               ].map((item) => (
                 <span
                   key={item}
@@ -139,25 +141,6 @@ const Home = () => {
                 </span>
               ))}
             </div>
-          </div>
-
-          <div className="rounded-3xl border border-base-200 bg-base-200/60 p-6">
-            <h3 className="text-xl font-semibold">What buyers search us for</h3>
-            <ul className="mt-5 space-y-4 text-base-content/70">
-              {[
-                "Virendra Research Chem LLP",
-                "chemical manufacturer in Navi Mumbai",
-                "chemical manufacturer in Mumbai",
-                "specialty chemical manufacturer in Maharashtra",
-                "aroma chemicals manufacturer in India",
-                "pheromone intermediates manufacturer",
-              ].map((item) => (
-                <li key={item} className="flex gap-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-primary" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </section>
@@ -207,10 +190,10 @@ const Home = () => {
         <div className="max-w-6xl mx-auto space-y-8">
           <div>
             <p className="text-sm uppercase tracking-[0.35em] text-primary/70 font-semibold">
-              Search and AI FAQs
+              Frequently Asked Questions
             </p>
             <h2 className="mt-3 text-3xl font-bold">
-              Entity-rich answers for buyers and AI assistants
+              Common questions from buyers and technical teams
             </h2>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
@@ -223,6 +206,57 @@ const Home = () => {
                 <p className="mt-3 text-base-content/70 leading-relaxed">
                   {item.answer}
                 </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="text-sm uppercase tracking-[0.35em] text-primary/70 font-semibold">
+                Insights & Updates
+              </p>
+              <h2 className="mt-3 text-3xl font-bold">
+                Practical reads for sourcing, scale-up, and manufacturing
+              </h2>
+            </div>
+            <Link to="/blogs" className="btn btn-outline border-base-300 text-base-content">
+              View all blogs
+            </Link>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {blogPosts.slice(0, 3).map((post) => (
+              <article
+                key={post.slug}
+                className="rounded-3xl border border-base-200 bg-base-100 shadow-sm"
+              >
+                <img
+                  src={post.coverImage}
+                  alt={post.title}
+                  className="h-52 w-full rounded-t-3xl object-cover"
+                />
+                <div className="p-6">
+                  <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-semibold">
+                    {post.targetKeyword}
+                  </p>
+                  <h3 className="mt-3 text-2xl font-bold leading-tight">
+                    <Link to={getBlogPath(post.slug)}>{post.title}</Link>
+                  </h3>
+                  <p className="mt-3 text-base-content/70 leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                  <Link
+                    to={getBlogPath(post.slug)}
+                    className="mt-5 inline-flex items-center gap-2 font-semibold text-primary"
+                  >
+                    Read more
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
               </article>
             ))}
           </div>

@@ -7,9 +7,11 @@ import {
 } from "../../../utils/productImages.js";
 import { formatCasNumber } from "../../../utils/productFormatting.js";
 import { getProductPath } from "../../../utils/seo.js";
+import { useEnquiryCart } from "../../../context/EnquiryCartContext.jsx";
 
 const ProductCard = ({ product }) => {
   const { title, casNo, category, description, image, bondImage } = product;
+  const { addItem, hasItem, openCart } = useEnquiryCart();
   const productImage =
     normalizeDriveImageUrl(image) || getProductImage(product);
   const bondImageUrl = normalizeDriveImageUrl(bondImage);
@@ -19,6 +21,7 @@ const ProductCard = ({ product }) => {
     : title;
   const displayImageClass = bondImageUrl ? "object-contain" : "object-cover";
   const casLabel = formatCasNumber(casNo);
+  const isInCart = hasItem(product.id);
 
   return (
     <Link
@@ -58,13 +61,31 @@ const ProductCard = ({ product }) => {
         )}
 
         <div className="mt-auto pt-6">
-          <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
-            View specification
-            <MaterialIcon
-              name="arrow_forward"
-              className="text-lg transition-transform group-hover:translate-x-1"
-            />
-          </span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+              View specification
+              <MaterialIcon
+                name="arrow_forward"
+                className="text-lg transition-transform group-hover:translate-x-1"
+              />
+            </span>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                addItem(product);
+                openCart();
+              }}
+              className={`btn btn-sm ${
+                isInCart
+                  ? "btn-outline border-base-300 text-base-content"
+                  : "border-primary bg-primary text-white hover:border-primary hover:bg-primary/90"
+              }`}
+            >
+              {isInCart ? "Added" : "Add to enquiry"}
+            </button>
+          </div>
         </div>
       </article>
     </Link>

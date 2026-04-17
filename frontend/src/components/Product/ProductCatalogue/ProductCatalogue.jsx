@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import MaterialIcon from "../../MaterialIcon.jsx";
 import featuredCategories from "../../../data/featuredCategories.js";
@@ -9,15 +9,9 @@ import useProducts from "../../../hooks/useProducts.js";
 const ProductCatalogue = () => {
   const { products, isLoading, isRefreshing, error, reload } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [query, setQuery] = useState(() => searchParams.get("search") || "");
-
-  useEffect(() => {
-    setQuery(searchParams.get("search") || "");
-  }, [searchParams]);
+  const query = searchParams.get("search") || "";
 
   const updateQuery = (value) => {
-    setQuery(value);
-
     const nextParams = new URLSearchParams(searchParams);
     const trimmedValue = value.trim();
 

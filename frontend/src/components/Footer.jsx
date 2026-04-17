@@ -33,6 +33,9 @@ const Footer = () => {
               <Link to="/about">About {siteConfig.company.name}</Link>
             </li>
             <li>
+              <Link to="/blogs">Blogs</Link>
+            </li>
+            <li>
               <Link to="/contact">Contact Us</Link>
             </li>
           </ul>

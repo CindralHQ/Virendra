@@ -1,5 +1,7 @@
 const env = globalThis.process?.env ?? {};
 
+import { blogPosts } from "../src/data/blogPosts.js";
+
 const escapeXml = (value) =>
   String(value || "")
     .replace(/&/g, "&amp;")
@@ -62,8 +64,14 @@ export default async function handler(req, res) {
     { loc: `${siteOrigin}/`, priority: "1.0" },
     { loc: `${siteOrigin}/about`, priority: "0.8" },
     { loc: `${siteOrigin}/products`, priority: "0.9" },
+    { loc: `${siteOrigin}/blogs`, priority: "0.9" },
     { loc: `${siteOrigin}/contact`, priority: "0.8" },
     ...categoryPaths.map((path) => ({ loc: `${siteOrigin}${path}`, priority: "0.8" })),
+    ...blogPosts.map((post) => ({
+      loc: `${siteOrigin}/blogs/${post.slug}`,
+      lastmod: post.dateModified || post.datePublished,
+      priority: "0.8",
+    })),
   ];
 
   try {

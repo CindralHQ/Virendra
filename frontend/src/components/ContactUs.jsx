@@ -137,12 +137,26 @@
 // export default ContactUs;
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import siteConfig from "../config/siteConfig.js";
 import MaterialIcon from "./MaterialIcon.jsx";
+import { useEnquiryCart } from "../context/EnquiryCartContext.jsx";
 
 const CONTACT_API_URL = (
   import.meta.env.VITE_CONTACT_API_URL || "/api/contact"
 ).replace(/\/$/, "");
+
+const getErrorMessage = async (response) => {
+  const contentType = response.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    const data = await response.json().catch(() => ({}));
+    return data.error || data.message || `Request failed with status ${response.status}.`;
+  }
+
+  const text = await response.text().catch(() => "");
+  return text || `Request failed with status ${response.status}.`;
+};
 
 const contactDetails = [
   {
@@ -169,6 +183,7 @@ const contactDetails = [
 ];
 
 const ContactUs = () => {
+  const { items, clearItems, openCart } = useEnquiryCart();
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState(null);
   const [errors, setErrors] = useState({});
@@ -197,6 +212,12 @@ const ContactUs = () => {
     const email = String(payload.email || "").trim();
     const phone = String(payload.phone || "").trim();
     const message = String(payload.message || "").trim();
+    const selectedProducts = items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      casNo: item.casNo,
+      category: item.category,
+    }));
 
     if (!name) {
       nextErrors.name = "Please enter your name.";
@@ -233,12 +254,14 @@ const ContactUs = () => {
       const response = await fetch(CONTACT_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          ...payload,
+          selectedProducts,
+        }),
       });
 
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || "Request failed.");
+        throw new Error(await getErrorMessage(response));
       }
 
       setNotice({
@@ -246,10 +269,18 @@ const ContactUs = () => {
         message: "Message sent successfully! We will get back to you soon.",
       });
       form.reset();
+      clearItems();
     } catch (err) {
+      const fallbackMessage =
+        err?.name === "TypeError"
+          ? "Could not reach the enquiry service. If you are testing locally, use a Vercel-served API or set VITE_CONTACT_API_URL. If this is deployed, verify that /api/contact is live."
+          : "Something went wrong. Please try again.";
+      const errorMessage =
+        err?.name === "TypeError" ? fallbackMessage : err?.message || fallbackMessage;
+
       setNotice({
         type: "error",
-        message: err.message || "Something went wrong. Please try again.",
+        message: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -257,7 +288,7 @@ const ContactUs = () => {
   };
 
   return (
-    <section className="py-16 text-base-content">
+    <section className="bg-base-200/35 py-16 text-base-content">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-6 items-start">
         
         {/* LEFT PANEL */}
@@ -308,7 +339,7 @@ const ContactUs = () => {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="rounded-3xl border border-base-200 bg-base-100 p-6 sm:p-10 shadow-lg">
+        <div className="rounded-3xl border border-base-200 bg-base-100 p-6 shadow-lg sm:p-10">
           <p className="text-xs uppercase tracking-[0.4em] text-primary/80 font-semibold">
             contact {siteConfig.company.name}
           </p>
@@ -320,13 +351,80 @@ const ContactUs = () => {
             samples, or pilot timelines—whatever you prefer.
           </p>
 
+          <div className="mt-6 rounded-3xl border border-base-200 bg-base-200/45 p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary/75">
+                  Enquiry cart
+                </p>
+                <h3 className="mt-2 text-lg font-semibold">
+                  {items.length
+                    ? `${items.length} selected product${items.length > 1 ? "s" : ""}`
+                    : "No products selected"}
+                </h3>
+              </div>
+              {items.length ? (
+                <button
+                  type="button"
+                  onClick={clearItems}
+                  className="btn btn-ghost btn-sm"
+                >
+                  Clear all
+                </button>
+              ) : null}
+            </div>
+
+            {items.length ? (
+              <div className="mt-4 rounded-2xl border border-base-200 bg-base-100 p-4 shadow-sm">
+                <p className="text-sm leading-relaxed text-base-content/70">
+                  {items.length} product{items.length > 1 ? "s are" : " is"} currently added to
+                  your enquiry cart. Review or edit the selection before sending your request.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={openCart}
+                    className="btn btn-primary btn-sm"
+                  >
+                    Open enquiry cart
+                  </button>
+                  <Link
+                    to="/products"
+                    className="btn btn-outline btn-sm border-base-300 text-base-content"
+                  >
+                    Browse products
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-2xl border border-dashed border-base-300 bg-base-100 p-4">
+                <p className="text-sm leading-relaxed text-base-content/70">
+                  Add products from the catalogue or molecule pages if you want to include
+                  multiple items in one enquiry.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link to="/products" className="btn btn-primary btn-sm">
+                    Search products
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={openCart}
+                    className="btn btn-outline btn-sm border-base-300 text-base-content"
+                  >
+                    Open enquiry cart
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* CONTACT FORM WITH EMAILJS */}
           <form onSubmit={sendEmail} className="mt-8 space-y-5" noValidate>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1">
                 <input
                   name="name"
-                  className={`input input-bordered border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
+                  className={`input input-bordered h-13 w-full rounded-2xl border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
                     errors.name ? "input-error" : ""
                   }`}
                   placeholder="Your name"
@@ -346,7 +444,7 @@ const ContactUs = () => {
               <div className="space-y-1">
                 <input
                   name="email"
-                  className={`input input-bordered border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
+                  className={`input input-bordered h-13 w-full rounded-2xl border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
                     errors.email ? "input-error" : ""
                   }`}
                   placeholder="Email address"
@@ -370,7 +468,7 @@ const ContactUs = () => {
               <div className="space-y-1">
                 <input
                   name="phone"
-                  className={`input input-bordered border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
+                  className={`input input-bordered h-13 w-full rounded-2xl border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
                     errors.phone ? "input-error" : ""
                   }`}
                   placeholder="Phone"
@@ -391,7 +489,7 @@ const ContactUs = () => {
               <div className="space-y-1">
                 <input
                   name="company"
-                  className="input input-bordered border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50"
+                  className="input input-bordered h-13 w-full rounded-2xl border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50"
                   placeholder="Company"
                   onInput={() => clearFieldError("company")}
                 />
@@ -401,10 +499,10 @@ const ContactUs = () => {
             <textarea
               rows={5}
               name="message"
-              className={`textarea textarea-bordered w-full border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
+              className={`textarea textarea-bordered min-h-36 w-full rounded-3xl border-base-200 bg-base-100 text-base-content placeholder:text-base-content/50 ${
                 errors.message ? "textarea-error" : ""
               }`}
-              placeholder="Tell us about the molecule or grade you need"
+              placeholder="Tell us about your requirement, quantity, purity, application, or timeline"
               required
               aria-invalid={errors.message ? "true" : "false"}
               aria-describedby={
@@ -412,6 +510,9 @@ const ContactUs = () => {
               }
               onInput={() => clearFieldError("message")}
             />
+            <p className="text-xs text-base-content/55">
+              Selected enquiry-cart products will be included automatically with this request.
+            </p>
             {errors.message && (
               <p id="contact-message-error" className="text-xs text-error">
                 {errors.message}
@@ -420,8 +521,10 @@ const ContactUs = () => {
 
             {notice && (
               <div
-                className={`alert ${
-                  notice.type === "success" ? "alert-success" : "alert-error"
+                className={`alert rounded-2xl border ${
+                  notice.type === "success"
+                    ? "border-success/30 bg-success/10 text-success-content"
+                    : "border-error/30 bg-error/10 text-error-content"
                 }`}
               >
                 <MaterialIcon

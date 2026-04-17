@@ -98,9 +98,8 @@ body {
   z-index: 60;
 }
 
-.logo-splash--visible {
-  opacity: 1;
-  pointer-events: auto;
+.logo-splash--animate {
+  animation: logoSplashBackdrop 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .logo-splash__logo {
@@ -109,4 +108,11 @@ body {
   object-fit: contain;
   animation: logoSplash 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   will-change: transform, opacity;
+}
+
+@keyframes logoSplashBackdrop {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
 }

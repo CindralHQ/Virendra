@@ -1,10 +1,13 @@
 import React from "react";
 import siteConfig from "../config/siteConfig.js";
 import MaterialIcon from "./MaterialIcon.jsx";
+import { useEnquiryCart } from "../context/EnquiryCartContext.jsx";
 
 const ConnectFab = () => {
+  const { itemCount, openCart } = useEnquiryCart();
+
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       <div className="dropdown dropdown-top dropdown-end">
         <label
           tabIndex={0}
@@ -48,6 +51,18 @@ const ConnectFab = () => {
           </li>
         </ul>
       </div>
+
+      <button
+        type="button"
+        onClick={openCart}
+        className="inline-flex items-center gap-2 rounded-full border border-base-300 bg-base-100 px-5 py-3 text-sm font-semibold text-base-content shadow-xl transition hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary"
+      >
+        <MaterialIcon name="inventory_2" className="text-lg leading-none" />
+        <span>Enquiry cart</span>
+        <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-primary px-2 text-xs font-bold leading-none text-primary-content">
+          {itemCount}
+        </span>
+      </button>
     </div>
   );
 };

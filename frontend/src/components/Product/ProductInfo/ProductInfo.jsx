@@ -18,11 +18,13 @@ import {
   getCategoryPath,
   getProductPath,
 } from "../../../utils/seo.js";
+import { useEnquiryCart } from "../../../context/EnquiryCartContext.jsx";
 
 const ProductInfo = () => {
   const { id } = useParams();
   const numericId = Number(id);
   const { products, isLoading, error, reload } = useProducts();
+  const { addItem, hasItem, openCart } = useEnquiryCart();
 
   const productSource = useMemo(
     () => (products.length ? products : demoProducts),
@@ -131,6 +133,11 @@ const ProductInfo = () => {
           product={product}
           hasDocuments={documents.length > 0}
           imageUrl={heroImageUrl}
+          onAddToEnquiry={() => {
+            addItem(product);
+            openCart();
+          }}
+          isInCart={hasItem(product.id)}
         />
 
         <section className="grid gap-6 md:grid-cols-2">
@@ -210,7 +217,7 @@ const ProductInfo = () => {
 const normalizeCategoryLabel = (value) =>
   (value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
-const ProductHero = ({ product, hasDocuments, imageUrl }) => {
+const ProductHero = ({ product, hasDocuments, imageUrl, onAddToEnquiry, isInCart }) => {
   return (
     <section className="relative isolate overflow-hidden rounded-3xl border border-base-200 bg-base-100 p-10 shadow-xl">
       {imageUrl && (
@@ -240,12 +247,12 @@ const ProductHero = ({ product, hasDocuments, imageUrl }) => {
             CAS: {formatCasNumber(product.casNo)}
           </span>
           {product.category && (
-            <span className="rounded-full border border-base-300 px-4 py-2 text-base-content/70">
+            <span className="rounded-full border border-base-300 bg-base-100 px-4 py-2 text-base-content/70">
               {product.category}
             </span>
           )}
           {hasDocuments && (
-            <span className="badge badge-success">
+            <span className="rounded-full border border-success/25 bg-success/12 px-4 py-2 text-success whitespace-nowrap">
               Docs ready
             </span>
           )}
@@ -255,6 +262,17 @@ const ProductHero = ({ product, hasDocuments, imageUrl }) => {
           <Link className="btn btn-primary" to="/products">
             Back to catalogue
           </Link>
+          <button
+            type="button"
+            onClick={onAddToEnquiry}
+            className={`btn ${
+              isInCart
+                ? "btn-outline border-base-300 text-base-content"
+                : "border-primary bg-primary text-white hover:border-primary hover:bg-primary/90"
+            }`}
+          >
+            {isInCart ? "Added to enquiry cart" : "Add to enquiry cart"}
+          </button>
           {hasDocuments && (
             <a
               href="#documents"
