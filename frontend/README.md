@@ -17,7 +17,13 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## Contact Form Email
 
-The contact form now posts to `/api/contact` and sends mail with `nodemailer`.
+The contact form can post either to `/api/contact` for the existing `nodemailer` flow or directly to a published Google Apps Script web app.
+
+To use Google Apps Script, set:
+
+- `VITE_CONTACT_API_URL=https://script.google.com/macros/s/.../exec`
+
+When `VITE_CONTACT_API_URL` points to `script.google.com`, the frontend sends `name`, `email`, `phone`, `company`, and `message` as form data so it matches the Apps Script `doPost(e)` handler. Any enquiry-cart products are appended into the `message` body before submission.
 
 Configure these environment variables before deploying:
 

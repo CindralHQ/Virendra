@@ -145,6 +145,7 @@ import { useEnquiryCart } from "../context/EnquiryCartContext.jsx";
 const CONTACT_API_URL = (
   import.meta.env.VITE_CONTACT_API_URL || "/api/contact"
 ).replace(/\/$/, "");
+const APPS_SCRIPT_URL_PATTERN = /^https:\/\/script\.google\.com\//i;
 
 const getErrorMessage = async (response) => {
   const contentType = response.headers.get("content-type") || "";
@@ -157,6 +158,44 @@ const getErrorMessage = async (response) => {
   const text = await response.text().catch(() => "");
   return text || `Request failed with status ${response.status}.`;
 };
+
+const formatSelectedProducts = (items) => {
+  if (!items.length) {
+    return "";
+  }
+
+  return items
+    .map((item, index) => {
+      const details = [
+        item.title || "Untitled product",
+        item.casNo ? `CAS: ${item.casNo}` : null,
+        item.category ? `Category: ${item.category}` : null,
+      ]
+        .filter(Boolean)
+        .join(" | ");
+
+      return `${index + 1}. ${details}`;
+    })
+    .join("\n");
+};
+
+const buildMessage = (message, items) => {
+  const trimmedMessage = String(message || "").trim();
+  const selectedProducts = formatSelectedProducts(items);
+
+  if (!selectedProducts) {
+    return trimmedMessage;
+  }
+
+  return [
+    trimmedMessage,
+    "",
+    "Selected enquiry cart products:",
+    selectedProducts,
+  ].join("\n");
+};
+
+const isAppsScriptEndpoint = (url) => APPS_SCRIPT_URL_PATTERN.test(url);
 
 const contactDetails = [
   {
@@ -212,12 +251,7 @@ const ContactUs = () => {
     const email = String(payload.email || "").trim();
     const phone = String(payload.phone || "").trim();
     const message = String(payload.message || "").trim();
-    const selectedProducts = items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      casNo: item.casNo,
-      category: item.category,
-    }));
+    const composedMessage = buildMessage(payload.message, items);
 
     if (!name) {
       nextErrors.name = "Please enter your name.";
@@ -252,28 +286,51 @@ const ContactUs = () => {
 
     try {
       const response = await fetch(CONTACT_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...payload,
-          selectedProducts,
-        }),
+        ...(isAppsScriptEndpoint(CONTACT_API_URL)
+          ? {
+              method: "POST",
+              mode: "no-cors",
+              body: new URLSearchParams({
+                name,
+                email,
+                phone,
+                company: String(payload.company || "").trim(),
+                message: composedMessage,
+              }),
+            }
+          : {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...payload,
+                message: composedMessage,
+                selectedProducts: items.map((item) => ({
+                  id: item.id,
+                  title: item.title,
+                  casNo: item.casNo,
+                  category: item.category,
+                })),
+              }),
+            }),
       });
 
-      if (!response.ok) {
+      if (!isAppsScriptEndpoint(CONTACT_API_URL) && !response.ok) {
         throw new Error(await getErrorMessage(response));
       }
 
       setNotice({
         type: "success",
-        message: "Message sent successfully! We will get back to you soon.",
+        message: "Message sent successfully. We will get back to you soon.",
       });
       form.reset();
       clearItems();
     } catch (err) {
+      const usingAppsScript = isAppsScriptEndpoint(CONTACT_API_URL);
       const fallbackMessage =
         err?.name === "TypeError"
-          ? "Could not reach the enquiry service. If you are testing locally, use a Vercel-served API or set VITE_CONTACT_API_URL. If this is deployed, verify that /api/contact is live."
+          ? usingAppsScript
+            ? "Could not reach the Apps Script endpoint. Verify that the deployed web app URL in VITE_CONTACT_API_URL is correct and that the script is published for external access."
+            : "Could not reach the enquiry service. If you are testing locally, use a Vercel-served API or set VITE_CONTACT_API_URL. If this is deployed, verify that /api/contact is live."
           : "Something went wrong. Please try again.";
       const errorMessage =
         err?.name === "TypeError" ? fallbackMessage : err?.message || fallbackMessage;
